@@ -1,1 +1,1 @@
-clang++ src/main.cpp -o ./bin/main | ./bin/main $1
+clang++ src/t main.cpp -o ./bin/main | ./bin/main $1
