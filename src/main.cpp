@@ -16,14 +16,13 @@ int main(int argc, char *argv[]) {
 
     int day_nr = atoi(argv[1]);
     bool isPart1 = true;
-    if (argc > 2) {
-        isPart1 = strcmp(argv[2], "b") != 0;
-    }
+    if (argc > 2) isPart1 = strcmp(argv[2], "b") != 0;
 
-    cout << "Running Day " << day_nr << " Part " << (isPart1 ? "1" : "2")
-         << ":\n";
+    bool test_file = false;
+    if (argc > 3) test_file = strcmp(argv[3], "test") == 0;
 
-    string filename = "data/day" + to_string(day_nr) + ".txt";
+    string filename =
+        "data/day" + to_string(day_nr) + (test_file ? "_test.txt" : ".txt");
     ifstream file(filename);
     vector<string> lines = vector<string>();
     string curr_line;
