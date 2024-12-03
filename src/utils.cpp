@@ -1,20 +1,15 @@
-#include <iostream>
-#include <string>
-#include <vector>
+#include "utils.h"
 
 namespace utils {
-
-using namespace std;
-
-vector<string> split(string str, string delimiter) {
-  vector<string> split = vector<string>();
+std::vector<std::string> split(std::string str, std::string delimiter) {
+  std::vector<std::string> split = std::vector<std::string>();
 
   if (delimiter.length() == 0) {
     split.push_back(str);
     return split;
   }
 
-  string buffer;
+  std::string buffer;
   int i = 0;
   while (i < str.length()) {
     char ch = str[i];
@@ -25,7 +20,7 @@ vector<string> split(string str, string delimiter) {
       continue;
     }
 
-    string lookahead_buf;
+    std::string lookahead_buf;
     int offset = 0;
     while (offset < delimiter.length()) {
       char ch = str[i + offset];
@@ -57,5 +52,4 @@ vector<string> split(string str, string delimiter) {
 
   return split;
 }
-
 } // namespace utils
