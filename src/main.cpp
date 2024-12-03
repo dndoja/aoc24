@@ -3,6 +3,7 @@
 #include <string>
 
 #include "day_1.cpp"
+#include "day_2.cpp"
 
 using namespace std;
 
@@ -33,6 +34,9 @@ int main(int argc, char *argv[]) {
   switch (day_nr) {
   case 1:
     result = day_1::run(lines, isPart1);
+    break;
+  case 2:
+    result = day_2::run(lines, isPart1);
     break;
   default:
     cout << "error: not implemented yet!\n";

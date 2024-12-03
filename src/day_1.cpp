@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 
-#include "utils.cpp"
+#include "utils.h"
 
 using namespace std;
 
@@ -45,8 +45,7 @@ int run(vector<string> lines, bool is_part1) {
   uint values_l[line_count];
 
   for (int i = 0; i < line_count; i++) {
-    string line = lines[i];
-    vector<string> split = utils::split(line, " ");
+    vector<string> split = utils::split(lines[i], " ");
     values_l[i] = stoi(split[0]);
     values_r[i] = stoi(split[1]);
   }
