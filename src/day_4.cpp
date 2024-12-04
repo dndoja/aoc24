@@ -8,19 +8,17 @@
 namespace day_4 {
 struct Point {
     int x, y;
+
+    int i_in_grid(int grid_size) { return y * grid_size + x; }
+
+    bool off_grid(int grid_size) {
+        return x < 0 || x >= grid_size || y < 0 || y >= grid_size;
+    }
+
+    static Point from_index(int i, int grid_size) {
+        return {i % grid_size, i / grid_size};
+    }
 };
-
-Point i_to_pt(int i, int grid_size) { return {i % grid_size, i / grid_size}; }
-
-int pt_to_i(Point *ptr, int grid_size) {
-    Point pt = *ptr;
-    return pt.y * grid_size + pt.x;
-}
-
-bool pt_on_grid(Point *ptr, int grid_size) {
-    Point pt = *ptr;
-    return pt.x >= 0 && pt.x < grid_size && pt.y >= 0 && pt.y < grid_size;
-}
 
 int run_pt_1_(std::string input, int size) {
     const char valid_chars[] = {'X', 'M', 'A', 'S'};
@@ -41,11 +39,11 @@ int run_pt_1_(std::string input, int size) {
         char ch = input[i];
         if (ch != 'X') continue;
 
-        Point point = i_to_pt(i, size);
+        Point point = Point::from_index(i, size);
 
         for (Point dir : dir_offsets) {
             Point extent = {point.x + 3 * dir.x, point.y + 3 * dir.y};
-            if (!pt_on_grid(&extent, size)) continue;
+            if (extent.off_grid(size)) continue;
 
             bool is_valid = true;
 
@@ -54,7 +52,7 @@ int run_pt_1_(std::string input, int size) {
                     point.x + offset * dir.x,
                     point.y + offset * dir.y,
                 };
-                char ch = input[pt_to_i(&offset_pt, size)];
+                char ch = input[offset_pt.i_in_grid(size)];
 
                 if (valid_chars[offset] != ch) {
                     is_valid = false;
@@ -76,23 +74,23 @@ int run_pt_2_(std::string input, int size) {
         char ch = input[i];
         if (ch != 'A') continue;
 
-        Point center = i_to_pt(i, size);
+        Point center = Point::from_index(i, size);
 
         Point tl = {center.x - 1, center.y + 1};
-        if (!pt_on_grid(&tl, size)) continue;
-        char ch_tl = input[pt_to_i(&tl, size)];
+        if (tl.off_grid(size)) continue;
+        char ch_tl = input[tl.i_in_grid(size)];
 
         Point tr = {center.x + 1, center.y + 1};
-        if (!pt_on_grid(&tr, size)) continue;
-        char ch_tr = input[pt_to_i(&tr, size)];
+        if (tr.off_grid(size)) continue;
+        char ch_tr = input[tr.i_in_grid(size)];
 
         Point bl = {center.x - 1, center.y - 1};
-        if (!pt_on_grid(&bl, size)) continue;
-        char ch_bl = input[pt_to_i(&bl, size)];
+        if (bl.off_grid(size)) continue;
+        char ch_bl = input[bl.i_in_grid(size)];
 
         Point br = {center.x + 1, center.y - 1};
-        if (!pt_on_grid(&br, size)) continue;
-        char ch_br = input[pt_to_i(&br, size)];
+        if (br.off_grid(size)) continue;
+        char ch_br = input[br.i_in_grid(size)];
 
         bool valid =
             (ch_tl == 'S' && ch_br == 'M') || (ch_tl == 'M' && ch_br == 'S');
