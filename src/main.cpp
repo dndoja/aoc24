@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
     lines.push_back(curr_line);
   }
 
-  int result = run_day(day_nr, lines, isPart1);
+  int result = run_day(day_nr, &lines, isPart1);
   cout << "Result: " << result << "\n";
 
   return 0;

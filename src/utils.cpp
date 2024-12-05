@@ -1,6 +1,14 @@
 #include "utils.h"
+#include <iostream>
 
 namespace utils {
+void print_ints(std::vector<int> const *vec) {
+    for (int i : *vec) {
+        std::cout << i << " ";
+    }
+    std::cout << "\n";
+}
+
 std::vector<std::string> split(std::string str, std::string delimiter) {
     std::vector<std::string> split = std::vector<std::string>();
 
