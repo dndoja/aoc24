@@ -7,10 +7,10 @@
 
 int run_day(int day_nr, std::vector<std::string> const* lines_ptr, bool isPart1) {
     switch (day_nr) {
-    case 1: return day_1::run(*lines_ptr, isPart1);
-    case 2: return day_2::run(*lines_ptr, isPart1);
-    case 3: return day_3::run(*lines_ptr, isPart1);
-    case 4: return day_4::run(*lines_ptr, isPart1);
+    case 1: return day_1::run(lines_ptr, isPart1);
+    case 2: return day_2::run(lines_ptr, isPart1);
+    case 3: return day_3::run(lines_ptr, isPart1);
+    case 4: return day_4::run(lines_ptr, isPart1);
     case 5: return day_5::run(lines_ptr, isPart1);
     default:
         std::cout << "error: not implemented yet!\n";

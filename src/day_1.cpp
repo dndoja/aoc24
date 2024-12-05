@@ -36,7 +36,8 @@ uint run_pt2_(uint length, uint values_l[], uint values_r[]) {
     return similarity;
 }
 
-int run(std::vector<std::string> lines, bool is_part1) {
+int run(std::vector<std::string> const *lines_ptr, bool is_part1) {
+    std::vector<std::string> lines = *lines_ptr;
     uint line_count = lines.size();
     uint values_r[line_count];
     uint values_l[line_count];
