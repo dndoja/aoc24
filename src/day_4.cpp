@@ -6,32 +6,8 @@
 #include "utils.h"
 
 namespace day_4 {
-struct Point {
-    int x, y;
-
-    int i_in_grid(int grid_size) { return y * grid_size + x; }
-
-    bool off_grid(int grid_size) {
-        return x < 0 || x >= grid_size || y < 0 || y >= grid_size;
-    }
-
-    static Point from_index(int i, int grid_size) {
-        return {i % grid_size, i / grid_size};
-    }
-};
-
 int run_pt_1_(std::string input, int size) {
     const char valid_chars[] = {'X', 'M', 'A', 'S'};
-    const Point dir_offsets[] = {
-        {0, 1},   // North
-        {1, 1},   // North-East
-        {1, 0},   // East
-        {1, -1},  // South-East
-        {0, -1},  // South
-        {-1, -1}, // South-West
-        {-1, 0},  // West
-        {-1, 1},  // North-West
-    };
 
     int count = 0;
 
@@ -39,18 +15,22 @@ int run_pt_1_(std::string input, int size) {
         char ch = input[i];
         if (ch != 'X') continue;
 
-        Point point = Point::from_index(i, size);
+        auto point = utils::Pt::from_index(i, size);
 
-        for (Point dir : dir_offsets) {
-            Point extent = {point.x + 3 * dir.x, point.y + 3 * dir.y};
+        for (utils::Dir dir : utils::directions) {
+            utils::Pt dir_offset = utils::dir_offset(dir);
+            utils::Pt extent = {
+                point.x + 3 * dir_offset.x,
+                point.y + 3 * dir_offset.y,
+            };
             if (extent.off_grid(size)) continue;
 
             bool is_valid = true;
 
             for (int offset = 1; offset <= 3; offset++) {
-                Point offset_pt = {
-                    point.x + offset * dir.x,
-                    point.y + offset * dir.y,
+                utils::Pt offset_pt = {
+                    point.x + offset * dir_offset.x,
+                    point.y + offset * dir_offset.y,
                 };
                 char ch = input[offset_pt.i_in_grid(size)];
 
@@ -74,21 +54,21 @@ int run_pt_2_(std::string input, int size) {
         char ch = input[i];
         if (ch != 'A') continue;
 
-        Point center = Point::from_index(i, size);
+        utils::Pt center = utils::Pt::from_index(i, size);
 
-        Point tl = {center.x - 1, center.y + 1};
+        utils::Pt tl = {center.x - 1, center.y + 1};
         if (tl.off_grid(size)) continue;
         char ch_tl = input[tl.i_in_grid(size)];
 
-        Point tr = {center.x + 1, center.y + 1};
+        utils::Pt tr = {center.x + 1, center.y + 1};
         if (tr.off_grid(size)) continue;
         char ch_tr = input[tr.i_in_grid(size)];
 
-        Point bl = {center.x - 1, center.y - 1};
+        utils::Pt bl = {center.x - 1, center.y - 1};
         if (bl.off_grid(size)) continue;
         char ch_bl = input[bl.i_in_grid(size)];
 
-        Point br = {center.x + 1, center.y - 1};
+        utils::Pt br = {center.x + 1, center.y - 1};
         if (br.off_grid(size)) continue;
         char ch_br = input[br.i_in_grid(size)];
 
