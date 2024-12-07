@@ -3,7 +3,7 @@
 
 namespace utils {
 
-int Pt::hash() { return x ^ y; }
+int Pt::hash() { return x | y << 12; }
 
 int Pt::i_in_grid(int grid_size) { return y * grid_size + x; }
 
@@ -14,6 +14,8 @@ bool Pt::off_grid(int grid_size) {
 Pt Pt::from_index(int i, int grid_size) {
     return {i % grid_size, i / grid_size};
 }
+
+Pt Pt::operator+(const Pt &other) { return {x + other.x, y + other.y}; }
 
 Pt dir_offset(Dir dir) {
     constexpr Pt direction_offsets[8] = {
@@ -28,6 +30,12 @@ Pt dir_offset(Dir dir) {
     };
 
     return direction_offsets[dir];
+}
+
+Dir rot90(Dir dir, bool clockwise) {
+    int mul = clockwise ? 1 : -1;
+    int i_rotated = (dir + 2 * mul) % 8;
+    return directions[i_rotated];
 }
 
 void print_ints(std::vector<int> const *vec) {
