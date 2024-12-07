@@ -64,8 +64,7 @@ uint run_pt2_(int length, std::vector<int> input[]) {
     return count;
 }
 
-int run(std::vector<std::string> const *lines_ptr, bool is_part1) {
-    std::vector<std::string> lines = *lines_ptr;
+int run(std::vector<std::string> const &lines, bool is_part1) {
     uint line_count = lines.size();
     std::vector<int> rows[line_count];
 

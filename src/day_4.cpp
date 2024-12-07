@@ -82,10 +82,10 @@ int run_pt_2_(std::string input, int size) {
     return count;
 }
 
-int run(std::vector<std::string> const *lines, bool is_part1) {
+int run(std::vector<std::string> &lines, bool is_part1) {
     int size = lines[0].size();
     std::string full = "";
-    for (std::string line : *lines) {
+    for (std::string line : lines) {
         full += line;
     }
 

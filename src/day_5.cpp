@@ -7,11 +7,11 @@
 #include "utils.h"
 
 namespace day_5 {
-int run(std::vector<std::string> const *lines, bool is_part1) {
+int run(std::vector<std::string> &lines, bool is_part1) {
     auto rows = std::vector<std::vector<int>>();
     auto rules = std::unordered_map<int, std::unordered_set<int>>();
 
-    for (std::string line : *lines) {
+    for (std::string line : lines) {
         std::vector<std::string> split = utils::split(line, "|");
 
         if (split.size() == 2) {
