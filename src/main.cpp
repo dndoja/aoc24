@@ -1,3 +1,4 @@
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -28,8 +29,14 @@ int main(int argc, char *argv[]) {
         lines.push_back(curr_line);
     }
 
+    auto begin = std::chrono::steady_clock::now();
     std::string result = run_day(day_nr, lines, isPart1);
-    cout << "Result: " << result << "\n";
+    auto end = std::chrono::steady_clock::now();
+    auto elapsed_str =
+        std::chrono::duration_cast<std::chrono::milliseconds>(end - begin)
+            .count();
+
+    cout << "Finished in " << elapsed_str << "ms: " << result << endl;
 
     return 0;
 }
