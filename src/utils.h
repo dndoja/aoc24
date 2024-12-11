@@ -9,7 +9,7 @@ struct Pt {
     int x, y;
 
     int hash();
-    int i_in_grid(int grid_size);
+    int flat(int grid_size);
     bool off_grid(int grid_size);
     Pt operator+(const Pt &other);
 
@@ -30,6 +30,8 @@ enum Dir {
 constexpr Dir directions[8] = {
     NORTH, NORTH_EAST, EAST, SOUTH_EAST, SOUTH, SOUTH_WEST, WEST, NORTH_WEST,
 };
+
+constexpr Dir directions_cartesian[4] = {NORTH, EAST, SOUTH, WEST};
 
 Pt dir_offset(Dir dir);
 Dir rot90(Dir dir, bool clockwise = true);

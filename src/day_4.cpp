@@ -32,7 +32,7 @@ int run_pt_1_(std::string input, int size) {
                     point.x + offset * dir_offset.x,
                     point.y + offset * dir_offset.y,
                 };
-                char ch = input[offset_pt.i_in_grid(size)];
+                char ch = input[offset_pt.flat(size)];
 
                 if (valid_chars[offset] != ch) {
                     is_valid = false;
@@ -58,19 +58,19 @@ int run_pt_2_(std::string input, int size) {
 
         utils::Pt tl = {center.x - 1, center.y + 1};
         if (tl.off_grid(size)) continue;
-        char ch_tl = input[tl.i_in_grid(size)];
+        char ch_tl = input[tl.flat(size)];
 
         utils::Pt tr = {center.x + 1, center.y + 1};
         if (tr.off_grid(size)) continue;
-        char ch_tr = input[tr.i_in_grid(size)];
+        char ch_tr = input[tr.flat(size)];
 
         utils::Pt bl = {center.x - 1, center.y - 1};
         if (bl.off_grid(size)) continue;
-        char ch_bl = input[bl.i_in_grid(size)];
+        char ch_bl = input[bl.flat(size)];
 
         utils::Pt br = {center.x + 1, center.y - 1};
         if (br.off_grid(size)) continue;
-        char ch_br = input[br.i_in_grid(size)];
+        char ch_br = input[br.flat(size)];
 
         bool valid =
             (ch_tl == 'S' && ch_br == 'M') || (ch_tl == 'M' && ch_br == 'S');

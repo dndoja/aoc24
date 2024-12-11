@@ -5,7 +5,7 @@ namespace utils {
 
 int Pt::hash() { return x | y << 12; }
 
-int Pt::i_in_grid(int grid_size) { return y * grid_size + x; }
+int Pt::flat(int grid_size) { return y * grid_size + x; }
 
 bool Pt::off_grid(int grid_size) {
     return x < 0 || x >= grid_size || y < 0 || y >= grid_size;

@@ -27,8 +27,8 @@ void print_matrix_(int size, bool obstacles[], std::unordered_set<int> visited,
         for (int x = 0; x < size; x++) {
             int y = size - i_row - 1;
             Pt pos = {x, y};
-            int i = pos.i_in_grid(size);
-            if (curr_pos.i_in_grid(size) == i) {
+            int i = pos.flat(size);
+            if (curr_pos.flat(size) == i) {
                 switch (curr_dir) {
                 case utils::NORTH:
                     std::cout << "^";
@@ -49,7 +49,7 @@ void print_matrix_(int size, bool obstacles[], std::unordered_set<int> visited,
                 std::cout << "X";
             } else if (obstacles[i]) {
                 std::cout << "#";
-            } else if (fake_obstacle_loc.i_in_grid(size) == i) {
+            } else if (fake_obstacle_loc.flat(size) == i) {
                 std::cout << "*";
             } else {
                 std::cout << ".";
@@ -97,7 +97,7 @@ int run(std::vector<std::string> const &lines, bool is_part1) {
                 break;
             }
 
-            obstacles[pos.i_in_grid(size)] = is_obstacle;
+            obstacles[pos.flat(size)] = is_obstacle;
         }
     }
 
@@ -112,7 +112,7 @@ int run(std::vector<std::string> const &lines, bool is_part1) {
 
         if (next_pos.off_grid(size)) break;
 
-        if (obstacles[next_pos.i_in_grid(size)]) {
+        if (obstacles[next_pos.flat(size)]) {
             curr_dir = rot90(curr_dir);
             continue;
         }
@@ -149,7 +149,7 @@ int run(std::vector<std::string> const &lines, bool is_part1) {
             if (next.off_grid(size)) break;
 
             if (next.hash() == new_obstacle_loc.hash() ||
-                obstacles[next.i_in_grid(size)]) {
+                obstacles[next.flat(size)]) {
 
                 int obstacle_id = Move{next, curr_dir}.hash();
 
