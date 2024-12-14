@@ -3,7 +3,16 @@
 
 namespace utils {
 
-int Pt::hash() { return x | y << 12; }
+void wait_for_input() {
+    std::string _;
+    std::cin >> _;
+}
+
+int Pt::hash() {
+    char sign_x = x < 0 ? 1 : 0;
+    char sign_y = y < 0 ? 1 : 0;
+    return abs(x) | abs(y) << 12 | sign_x << 29 | sign_y << 30;
+}
 
 int Pt::flat(int grid_size) { return y * grid_size + x; }
 
@@ -30,6 +39,13 @@ Pt dir_offset(Dir dir) {
     };
 
     return direction_offsets[dir];
+}
+
+Dir rot45(Dir dir, bool clockwise) {
+    int next = dir + (clockwise ? 1 : -1);
+    if (next < 0) return directions[7];
+    if (next > 7) return directions[0];
+    return directions[next];
 }
 
 Dir rot90(Dir dir, bool clockwise) {

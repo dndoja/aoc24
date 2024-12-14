@@ -31,12 +31,25 @@ constexpr Dir directions[8] = {
     NORTH, NORTH_EAST, EAST, SOUTH_EAST, SOUTH, SOUTH_WEST, WEST, NORTH_WEST,
 };
 
+const std::string directions_names[8] = {
+    "N", "NE", "E", "SE", "S", "SW", "W", "NW",
+};
+
 constexpr Dir directions_cartesian[4] = {NORTH, EAST, SOUTH, WEST};
+constexpr Dir directions_diagonal[4] = {
+    NORTH_EAST,
+    SOUTH_EAST,
+    SOUTH_WEST,
+    NORTH_WEST,
+};
 
 Pt dir_offset(Dir dir);
+Dir rot45(Dir dir, bool clockwise);
 Dir rot90(Dir dir, bool clockwise = true);
 
 void print_ints(std::vector<int> const *vec);
 std::vector<std::string> split(std::string str, std::string delimiter);
+void wait_for_input();
 } // namespace utils
+// namespace utils
 #endif
