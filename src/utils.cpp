@@ -1,5 +1,6 @@
 #include "utils.h"
 #include <iostream>
+#include <thread>
 
 namespace utils {
 
@@ -8,13 +9,15 @@ void wait_for_input() {
     std::cin >> _;
 }
 
+void sleep30() { std::this_thread::sleep_for(std::chrono::milliseconds(30)); }
+
 int Pt::hash() {
     char sign_x = x < 0 ? 1 : 0;
     char sign_y = y < 0 ? 1 : 0;
     return abs(x) | abs(y) << 12 | sign_x << 29 | sign_y << 30;
 }
 
-int Pt::flat(int grid_size) { return y * grid_size + x; }
+int Pt::flat(int width) { return y * width + x; }
 
 bool Pt::off_grid(int grid_size) {
     return x < 0 || x >= grid_size || y < 0 || y >= grid_size;

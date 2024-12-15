@@ -50,6 +50,7 @@ Dir rot90(Dir dir, bool clockwise = true);
 void print_ints(std::vector<int> const *vec);
 std::vector<std::string> split(std::string str, std::string delimiter);
 void wait_for_input();
+void sleep30();
 } // namespace utils
 // namespace utils
 #endif
