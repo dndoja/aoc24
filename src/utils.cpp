@@ -5,8 +5,7 @@
 namespace utils {
 
 void wait_for_input() {
-    std::string _;
-    std::cin >> _;
+    std::cin.get();
 }
 
 void sleep30() { std::this_thread::sleep_for(std::chrono::milliseconds(30)); }
@@ -19,8 +18,9 @@ int Pt::hash() {
 
 int Pt::flat(int width) { return y * width + x; }
 
-bool Pt::off_grid(int grid_size) {
-    return x < 0 || x >= grid_size || y < 0 || y >= grid_size;
+bool Pt::off_grid(int width, int height) {
+    if (height == -1) height = width;
+    return x < 0 || x >= width || y < 0 || y >= height;
 }
 
 Pt Pt::from_index(int i, int grid_size) {

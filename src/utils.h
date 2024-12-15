@@ -10,7 +10,7 @@ struct Pt {
 
     int hash();
     int flat(int grid_size);
-    bool off_grid(int grid_size);
+    bool off_grid(int width, int height = -1);
     Pt operator+(const Pt &other);
 
     static Pt from_index(int i, int grid_size);
