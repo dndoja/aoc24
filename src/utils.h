@@ -8,7 +8,7 @@ namespace utils {
 struct Pt {
     int x, y;
 
-    int hash();
+    int hash() const;
     int flat(int grid_size);
     bool off_grid(int width, int height = -1);
     Pt operator+(const Pt &other);

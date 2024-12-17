@@ -4,13 +4,11 @@
 
 namespace utils {
 
-void wait_for_input() {
-    std::cin.get();
-}
+void wait_for_input() { std::cin.get(); }
 
 void sleep30() { std::this_thread::sleep_for(std::chrono::milliseconds(30)); }
 
-int Pt::hash() {
+int Pt::hash() const {
     char sign_x = x < 0 ? 1 : 0;
     char sign_y = y < 0 ? 1 : 0;
     return abs(x) | abs(y) << 12 | sign_x << 29 | sign_y << 30;
