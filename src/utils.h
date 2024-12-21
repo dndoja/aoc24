@@ -16,6 +16,22 @@ struct Pt {
     static Pt from_index(int i, int grid_size);
 };
 
+template <typename T, size_t size> struct Arena {
+    T items[size];
+    int tail = -1;
+
+    T *make(T item) {
+        if (tail < size - 1) {
+            ++tail;
+        } else {
+            tail = 0;
+        }
+
+        items[tail] = item;
+        return &(items[tail]);
+    }
+};
+
 enum Dir {
     NORTH,
     NORTH_EAST,
