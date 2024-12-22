@@ -9,9 +9,11 @@ struct Pt {
     int x, y;
 
     int hash() const;
-    int flat(int grid_size);
-    bool off_grid(int width, int height = -1);
-    Pt operator+(const Pt &other);
+    int flat(int grid_size) const;
+    bool off_grid(int width, int height = -1) const;
+    Pt operator+(const Pt &other) const;
+    Pt operator*(int mul) const;
+    std::string to_string() const;
 
     static Pt from_index(int i, int grid_size);
 };

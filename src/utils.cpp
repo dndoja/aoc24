@@ -14,9 +14,9 @@ int Pt::hash() const {
     return abs(x) | abs(y) << 12 | sign_x << 29 | sign_y << 30;
 }
 
-int Pt::flat(int width) { return y * width + x; }
+int Pt::flat(int width) const { return y * width + x; }
 
-bool Pt::off_grid(int width, int height) {
+bool Pt::off_grid(int width, int height) const {
     if (height == -1) height = width;
     return x < 0 || x >= width || y < 0 || y >= height;
 }
@@ -25,7 +25,11 @@ Pt Pt::from_index(int i, int grid_size) {
     return {i % grid_size, i / grid_size};
 }
 
-Pt Pt::operator+(const Pt &other) { return {x + other.x, y + other.y}; }
+Pt Pt::operator+(const Pt &other) const { return {x + other.x, y + other.y}; }
+Pt Pt::operator*(int mul) const { return {x * mul, y * mul}; }
+std::string Pt::to_string() const {
+    return "(" + std::to_string(x) + "," + std::to_string(y) + ")";
+};
 
 Pt dir_offset(Dir dir) {
     constexpr Pt direction_offsets[8] = {
