@@ -48,10 +48,6 @@ struct Cheat {
     }
 };
 
-int manhattan(Pt const &a, Pt const &b) {
-    return abs(a.x - b.x) + abs(a.y - b.y);
-}
-
 /// Some caching would be good here because it's giga slow but whatever
 void find_cheat_exits(Map const &map,
                       std::unordered_map<uint64_t, Cheat> &cheats, Pt &start,
@@ -79,7 +75,7 @@ void find_cheat_exits(Map const &map,
             if (map.is_obstacle(next)) {
                 queue.push(next);
             } else {
-                int dist = manhattan(start, next);
+                int dist = utils::manhattan(start, next);
                 if (dist <= max_dist) {
                     int saved = start_weight - map.weight(next) - dist;
                     Cheat cheat = {start, next, saved};

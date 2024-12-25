@@ -8,6 +8,10 @@ void wait_for_input() { std::cin.get(); }
 
 void sleep30() { std::this_thread::sleep_for(std::chrono::milliseconds(30)); }
 
+int manhattan(Pt const &a, Pt const &b) {
+    return abs(a.x - b.x) + abs(a.y - b.y);
+}
+
 int Pt::hash() const {
     char sign_x = x < 0 ? 1 : 0;
     char sign_y = y < 0 ? 1 : 0;

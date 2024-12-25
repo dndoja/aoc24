@@ -62,6 +62,7 @@ constexpr Dir directions_diagonal[4] = {
 };
 
 Pt dir_offset(Dir dir);
+int manhattan(Pt const &a, Pt const &b);
 Dir rot45(Dir dir, bool clockwise);
 Dir rot90(Dir dir, bool clockwise = true);
 
