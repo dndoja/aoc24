@@ -21,6 +21,7 @@
 #include "day_20.cpp"
 #include "day_21.cpp"
 #include "day_22.cpp"
+#include "day_23.cpp"
 
 std::string run_day(int day_nr, std::vector<std::string> &lines, bool isPart1) {
     switch (day_nr) {
@@ -46,6 +47,7 @@ std::string run_day(int day_nr, std::vector<std::string> &lines, bool isPart1) {
     case 20: return std::to_string(day_20::run(lines,isPart1));
     case 21: return std::to_string(day_21::run(lines,isPart1));
     case 22: return std::to_string(day_22::run(lines,isPart1));
+    case 23: return day_23::run(lines,isPart1);
     default:
         return "error: not implemented yet!\n";
     }
