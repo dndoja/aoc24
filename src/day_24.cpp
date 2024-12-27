@@ -333,4 +333,3 @@ std::string run(std::vector<std::string> &lines, bool is_part1) {
     return result;
 }
 } // namespace day_24
-  //
