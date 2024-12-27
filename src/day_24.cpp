@@ -1,9 +1,7 @@
 #include "utils.h"
-#include <_types/_uint64_t.h>
 #include <algorithm>
 #include <iostream>
 #include <queue>
-#include <stack>
 #include <unordered_set>
 
 namespace day_24 {
