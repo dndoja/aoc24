@@ -46,13 +46,18 @@ int main(int argc, char *argv[]) {
     }
 
     auto begin = std::chrono::steady_clock::now();
-    std::string result = run_day(day_nr, lines, isPart1);
-    auto end = std::chrono::steady_clock::now();
-    auto elapsed_str =
-        std::chrono::duration_cast<std::chrono::milliseconds>(end - begin)
-            .count();
+    try {
+        std::string result = run_day(day_nr, lines, isPart1);
+        auto end = std::chrono::steady_clock::now();
+        auto elapsed_str =
+            std::chrono::duration_cast<std::chrono::milliseconds>(end - begin)
+                .count();
 
-    cout << "Finished in " << elapsed_str << "ms: " << result << endl;
+        cout << "Finished in " << elapsed_str << "ms: " << result << endl;
+        // your stuff
+    } catch (const std::exception &ex) {
+        cerr << ex.what() << endl;
+    }
 
     return 0;
 }

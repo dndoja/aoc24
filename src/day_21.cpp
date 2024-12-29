@@ -1,45 +1,25 @@
 #include "utils.h"
+#include <_types/_uint64_t.h>
 #include <climits>
 #include <iostream>
 #include <queue>
+#include <unordered_set>
 
 namespace day_21 {
 using utils::Dir;
 using utils::Pt;
 
 // clang-format off
-constexpr int _ = INT_MAX;
-constexpr Dir PUSH = Dir::SOUTH_WEST;
-constexpr char width = 3;
 constexpr char numpad[12] = {
     '7', '8', '9', 
     '4', '5', '6',
     '1', '2', '3',
     ' ', '0', 'A',
 };
+
 constexpr char keypad[6] = {
     ' ', '^', 'A', 
     '<', 'v', '>',
-};
-constexpr std::array<int,6>keypad_l = {
-    _, 2, 3, 
-    0, 1, 2,
-};
-constexpr std::array<int,6>keypad_r = {
-    _, 2, 1, 
-    3, 1, 0,
-};
-constexpr std::array<int,6>keypad_t = {
-    _, 0, 1, 
-    2, 1, 2,
-};
-constexpr std::array<int,6>keypad_b = {
-    _, 1, 2, 
-    1, 0, 1,
-};
-constexpr std::array<int,6> keypad_a = {
-    _, 1, 0, 
-    3, 2, 1,
 };
 
 enum KeypadButton {
@@ -51,23 +31,12 @@ enum KeypadButton {
 };
 // clang-format on
 
-bool valid_keypad_pos(Pt const &pt) {
-    return !pt.off_grid(3, 2) && !(pt.x == 2 && pt.y == 0);
+bool valid_numpad_pos(Pt const &pt) {
+    return !pt.off_grid(3, 4) && !(pt.x == 0 && pt.y == 3);
 }
 
-std::array<int, 6> const &keypad_dists(KeypadButton to) {
-    switch (to) {
-    case L:
-        return keypad_l;
-    case R:
-        return keypad_r;
-    case T:
-        return keypad_t;
-    case B:
-        return keypad_b;
-    case A:
-        return keypad_a;
-    }
+bool valid_keypad_pos(Pt const &pt) {
+    return !pt.off_grid(3, 2) && !(pt.x == 0 && pt.y == 0);
 }
 
 int keypad_dist(KeypadButton from, KeypadButton to) {
@@ -81,6 +50,19 @@ int keypad_dist(KeypadButton from, KeypadButton to) {
         case '>':
             return 2;
         case '^':
+            return 0;
+        };
+    }
+
+    if (from == 'v') {
+        switch (to) {
+        case '^':
+        case '<':
+        case '>':
+            return 1;
+        case 'A':
+            return 2;
+        case 'v':
             return 0;
         };
     }
@@ -144,6 +126,50 @@ Pt button_loc(KeypadButton button) {
     };
 };
 
+Pt button_offset(KeypadButton button) {
+    switch (button) {
+    case L:
+        return {-1, 0};
+    case R:
+        return {1, 0};
+    case T:
+        return {0, -1};
+    case B:
+        return {0, 1};
+    case A:
+        return {0, 0};
+    };
+}
+
+Pt numpad_loc(char ch) {
+    switch (ch) {
+    case 'A':
+        return {2, 3};
+    case '0':
+        return {1, 3};
+    case '1':
+        return {0, 2};
+    case '2':
+        return {1, 2};
+    case '3':
+        return {2, 2};
+    case '4':
+        return {0, 1};
+    case '5':
+        return {1, 1};
+    case '6':
+        return {2, 1};
+    case '7':
+        return {0, 0};
+    case '8':
+        return {1, 0};
+    case '9':
+        return {2, 0};
+    default:
+        throw std::invalid_argument("Invalid Char");
+    }
+}
+
 KeypadButton button_from_loc(Pt loc) {
     return (KeypadButton)keypad[loc.flat(3)];
 }
@@ -158,17 +184,15 @@ KeypadButton dir_button(Dir dir) {
         return KeypadButton::T;
     case utils::WEST:
         return KeypadButton::L;
-    case PUSH:
-        return KeypadButton::A;
     default:
-        throw "Invalid direction passed";
+        throw std::invalid_argument("Invalid direction passed");
     }
 }
 
 void print_numpad(Pt &loc, bool pressing) {
     char arm1 = numpad[loc.flat(3)];
     auto a = [arm1, pressing](char ch) {
-        return arm1 == ch ? pressing ? "# " : "^ " : "  ";
+        return arm1 == ch ? pressing ? "# " : "* " : "  ";
     };
 
     // clang-format off
@@ -188,7 +212,7 @@ void print_numpad(Pt &loc, bool pressing) {
 
 void print_keypad(KeypadButton curr, bool pressing) {
     auto a = [curr, pressing](char ch) {
-        return curr == ch ? pressing ? "# " : "^ " : "  ";
+        return curr == ch ? pressing ? "# " : "* " : "  ";
     };
 
     // clang-format off
@@ -200,224 +224,231 @@ void print_keypad(KeypadButton curr, bool pressing) {
     // clang-format on
 }
 
-struct KeypadPaths {
-    std::vector<KeypadButton> p1 = {};
-    std::vector<KeypadButton> p2 = {};
-    std::vector<KeypadButton> p3 = {};
+struct State {
+    int score = 0;
+    bool pressed_numpad = false;
+    Pt numpad_curr = {2, 3};
+    Pt numpad_goal = {2, 3};
+    KeypadButton lvl1_curr = KeypadButton::A;
+    KeypadButton lvl2_curr = KeypadButton::A;
 
-    std::vector<KeypadButton> &of(int level) {
-        switch (level) {
-        case 1:
-            return p1;
-        case 2:
-            return p2;
-        case 3:
-            return p3;
-        default:
-            throw "invalid level";
-        }
-    }
+    int hash() {
+        int hash = 0;
+        hash |= lvl1_curr;
+        hash |= lvl2_curr << 8;
+        hash |= numpad_curr.flat(3) << 16;
+        hash |= pressed_numpad << 20;
+        return hash;
+    };
 
-    void append(KeypadPaths &paths) {
-        for (int i = 1; i <= 3; i++) {
-            append(paths.of(i), i);
-        }
-    }
-
-    void append(std::vector<KeypadButton> &paths, int level) {
-        std::vector<KeypadButton> &target = of(level);
-        target.insert(target.end(), paths.begin(), paths.end());
-    }
-
-    void push_back(KeypadButton button, int level) {
-        of(level).push_back(button);
-    }
+    bool numpad_on_target() {
+        return !pressed_numpad && numpad_curr.hash() == numpad_goal.hash();
+    };
 
     void print() {
-        for (int i = 1; i <= 3; i++) {
-            for (KeypadButton move : of(i)) {
-                std::cout << char(move);
-            }
-            std::cout << " (" << of(i).size() << ")" << std::endl;
-        }
-        std::cout << std::endl;
+        print_numpad(numpad_curr, pressed_numpad);
+        std::cout << "_________" << std::endl << std::endl;
+        print_keypad(lvl1_curr, false);
+        std::cout << "_________" << std::endl << std::endl;
+        print_keypad(lvl2_curr, false);
     }
-};
 
-struct KeypadState {
-    KeypadButton b1 = KeypadButton::A;
-    KeypadButton b2 = KeypadButton::A;
-    KeypadButton b3 = KeypadButton::A;
-
-    KeypadButton *of(int level) {
+    KeypadButton curr_btn(int level) {
         switch (level) {
         case 1:
-            return &b1;
+            return lvl1_curr;
         case 2:
-            return &b2;
-        case 3:
-            return &b3;
+            return lvl2_curr;
         default:
-            throw "invalid level";
+            throw std::invalid_argument("Invalid number: " +
+                                        std::to_string(level));
         }
     }
 
-    void update(KeypadPaths &paths) {
-        for (int i = 1; i <= 3; i++) {
-            auto path = paths.of(i);
-            if (path.empty()) continue;
-            *of(i) = path.back();
+    void set_curr_btn(int level, KeypadButton button) {
+        switch (level) {
+        case 1:
+            lvl1_curr = button;
+            break;
+        case 2:
+            lvl2_curr = button;
+            break;
         }
     }
-};
 
-KeypadPaths expand(KeypadButton next, KeypadState& state, int level = 1) {
-    constexpr Dir NO_DIR = PUSH;
-    KeypadPaths expanded = {};
-    std::array<int, 6> dists = keypad_dists(next);
+    State *move(utils::DynamicArena<State> &arena, int level, KeypadButton by) {
+        State *new_state = arena.make({*this});
+        Pt new_loc = button_loc(curr_btn(level)) + button_offset(by);
+        new_state->set_curr_btn(level, button_from_loc(new_loc));
+        new_state->score++;
+        return new_state;
+    }
 
-    if (level == 1) std::cout << char(state.b1) << std::endl;
+    State *press(utils::DynamicArena<State> &arena, int level = 3) {
+        if (level == 3) return press(arena, level - 1);
 
-    while (*state.of(level) != next) {
-        Pt curr = button_loc(*state.of(level));
-        int curr_dist = dists[curr.flat(3)];
-        Dir best_dir = NO_DIR;
-        KeypadPaths best_paths = {};
+        if (level == 0) {
+            if (!numpad_on_target()) {
+                throw std::invalid_argument("Numpad misfire!");
+            }
 
-        for (Dir dir : utils::directions_cartesian) {
-            Pt next = curr + utils::dir_offset(dir);
-            if (next.off_grid(3, 2) || dists[next.flat(3)] >= curr_dist) {
+            State *new_state = arena.make(*this);
+            new_state->pressed_numpad = true;
+            new_state->score++;
+            return new_state;
+        }
+
+        KeypadButton btn = curr_btn(level);
+
+        if (btn == KeypadButton::A) return press(arena, level - 1);
+
+        State *new_state = arena.make(*this);
+
+        if (level == 1) {
+            new_state->numpad_curr = numpad_curr + button_offset(btn);
+        } else {
+            auto new_loc = button_loc(curr_btn(level - 1)) + button_offset(btn);
+            new_state->set_curr_btn(level - 1, button_from_loc(new_loc));
+        }
+
+        new_state->score++;
+        return new_state;
+    }
+
+    /*
+        7 8 9
+        4 5 6
+        3 2 1
+          0 A
+
+
+          ^ A    1
+        < v >
+            *
+
+
+          ^ A    2
+        < v >
+        *
+
+
+          ^ A    3
+        < v >
+    */
+    std::vector<KeypadButton> get_candidates(int level = 3) {
+        if (level == 3) return get_candidates(level - 1);
+
+        if (level == 0) {
+            if (numpad_on_target()) return {A};
+
+            int dist_to_goal = utils::manhattan(numpad_curr, numpad_goal);
+            std::vector<KeypadButton> intents = {};
+
+            for (Dir dir : utils::directions_cartesian) {
+                Pt next = numpad_curr + utils::dir_offset(dir);
+                if (!valid_numpad_pos(next)) continue;
+
+                if (utils::manhattan(next, numpad_goal) < dist_to_goal) {
+                    intents.push_back(dir_button(dir));
+                }
+            }
+
+            return intents;
+        }
+
+        KeypadButton curr = curr_btn(level);
+        Pt curr_loc = button_loc(curr);
+        std::vector<KeypadButton> child_candidates = get_candidates(level - 1);
+        std::vector<KeypadButton> candidates = {};
+
+        for (KeypadButton child : child_candidates) {
+            int dist_to_child = keypad_dist(curr, child);
+            if (dist_to_child == 0) {
+                candidates.push_back(A);
                 continue;
             }
 
-            if (level == 3) {
-                best_dir = dir;
+            for (Dir dir : utils::directions_cartesian) {
+                Pt next = curr_loc + utils::dir_offset(dir);
+                if (!valid_keypad_pos(next)) continue;
+
+                int dist = keypad_dist(button_from_loc(next), child);
+                if (dist < dist_to_child) {
+                    candidates.push_back(dir_button(dir));
+                }
+            }
+        }
+
+        return candidates;
+    }
+};
+
+struct StateCmp {
+    bool operator()(State const *a, State const *b) {
+        return a->score > b->score;
+    }
+};
+
+int get_op_count(std::array<char, 4> const &numpad_goals) {
+    State state = {};
+    auto arena = utils::DynamicArena<State>(20000);
+
+    for (int i = 0; i < 4; i++) {
+        state.numpad_goal = numpad_loc(numpad_goals[i]);
+        state.pressed_numpad = false;
+
+        std::priority_queue<State *, std::vector<State *>, StateCmp> queue = {};
+        std::unordered_set<int> visited = {};
+        std::unordered_map<int, int> scores = {};
+        queue.push(&state);
+
+        while (!queue.empty()) {
+            State *curr = queue.top();
+            queue.pop();
+
+            if (visited.contains(curr->hash())) continue;
+            visited.insert(curr->hash());
+
+            // system("clear");
+            // curr->print();
+
+            if (curr->pressed_numpad) {
+                state = *curr;
                 break;
             }
 
-            auto paths = expand(button_from_loc(next), state, level + 1);
-            if (best_dir == NO_DIR ||
-                paths.of(level + 1).size() < best_paths.of(level + 1).size()) {
-                best_dir = dir;
-                best_paths = paths;
-            }
-        }
+            auto candidates = curr->get_candidates();
+            for (KeypadButton candidate : candidates) {
+                State *next;
+                if (candidate == KeypadButton::A) {
+                    next = curr->press(arena);
+                } else {
+                    next = curr->move(arena, 2, candidate);
+                }
 
-        if (best_dir == NO_DIR) break;
-        // std::cout << curr.to_string() << std::endl;
-        // std::cout << char(dir_button(best_dir)) << std::endl;
-        // utils::wait_for_input();
-
-        auto next = curr + utils::dir_offset(best_dir);
-        expanded.append(best_paths);
-        expanded.push_back(dir_button(best_dir), level);
-
-        // if (level == 1) {
-        //     std::cout << char(dir_button(best_dir)) << std::endl;
-        //     std::cout << char(state.b1) << " " << char(state.b2) << " "
-        //               << char(state.b3) << std::endl;
-        //     expanded.print();
-        //     utils::wait_for_input();
-        // }
-
-        *state.of(level) = button_from_loc(next);
-        // state.update(expanded);
-    }
-
-    if (level < 3) {
-        auto press_path = expand(KeypadButton::A, state, level + 1);
-        expanded.append(press_path);
-    } else {
-        expanded.push_back(KeypadButton::A, level);
-    }
-
-
-    return expanded;
-}
-
-KeypadPaths get_path(KeypadState &state, char from, char to) {
-    Pt from_pt;
-    Pt to_pt;
-    for (int i = 0; i < 12; i++) {
-        if (numpad[i] == from) from_pt = Pt::from_index(i, 3);
-        if (numpad[i] == to) to_pt = Pt::from_index(i, 3);
-    }
-
-    // std::cout << char(from) << " " << from_pt.to_string() << std::endl;
-
-    Pt curr_pt = from_pt;
-    auto moves = std::vector<std::tuple<Pt, KeypadButton>>();
-    KeypadPaths big_path = {};
-
-    while (curr_pt.hash() != to_pt.hash()) {
-        int dist = utils::manhattan(curr_pt, to_pt);
-        auto valid_dirs = std::vector<Dir>();
-        for (Dir dir : utils::directions_cartesian) {
-            Pt next = curr_pt + utils::dir_offset(dir);
-            if (next.off_grid(3, 4) || numpad[next.flat(3)] == ' ' ||
-                utils::manhattan(next, to_pt) >= dist) {
-                continue;
+                auto prev_score = scores.find(next->hash());
+                if (prev_score == scores.end() ||
+                    next->score < prev_score->second) {
+                    queue.push(next);
+                    scores[next->hash()] = next->score;
+                }
             }
 
-            valid_dirs.push_back(dir);
-            break;
+            // utils::wait_for_input();
         }
-
-        if (valid_dirs.empty()) continue;
-
-        Dir best_dir = PUSH;
-        KeypadPaths best_paths = {};
-        for (Dir dir : valid_dirs) {
-            KeypadButton button = dir_button(dir);
-            auto path = expand(button, state);
-            if (best_dir == PUSH ||
-                path.of(3).size() < best_paths.of(3).size()) {
-                best_paths = path;
-                best_dir = dir;
-            }
-        }
-
-        std::cout << curr_pt.to_string() << " " << best_dir << std::endl;
-        Pt next = curr_pt + utils::dir_offset(best_dir);
-        big_path.append(best_paths);
-        state.update(big_path);
-        curr_pt = next;
-
-        // print_numpad(curr_pt, false);
-        // std::cout << "____________" << std::endl;
-        // print_keypad(state.b1, false);
-        // std::cout << "____________" << std::endl;
-        // print_keypad(state.b2, false);
-        // std::cout << "____________" << std::endl;
-        // print_keypad(state.b3, false);
-        // utils::wait_for_input();
     }
 
-    return big_path;
+    return state.score;
 }
 
 int run(std::vector<std::string> &lines, bool is_part1) {
     int total = 0;
 
-    KeypadState state = {};
-
     for (auto line : lines) {
-        char curr = 'A';
-        KeypadPaths paths = {};
-        auto numpad_locs = std::vector<Pt>();
-        for (char next : line) {
-            auto path = get_path(state, curr, next);
-            paths.append(path);
-            curr = next;
-        }
-
-        std::cout << line << std::endl;
-        paths.print();
-        std::cout << paths.of(3).size() << std::endl << std::endl;
-        total += paths.of(3).size() * std::stoi(line.substr(0, 3));
+        int count = get_op_count({line[0], line[1], line[2], line[3]});
+        total += count * std::stoi(line.substr(0, 3));
+        std::cout << count << std::endl;
     }
-
-    std::cout << total << std::endl;
 
     return total;
 }

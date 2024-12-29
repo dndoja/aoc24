@@ -1,6 +1,7 @@
 #ifndef AOC_UTILS_H_
 #define AOC_UTILS_H_
 
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -24,6 +25,25 @@ template <typename T, size_t size> struct Arena {
 
     T *make(T item) {
         if (tail < size - 1) {
+            ++tail;
+        } else {
+            tail = 0;
+        }
+
+        items[tail] = item;
+        return &(items[tail]);
+    }
+};
+
+template <typename T> struct DynamicArena {
+    DynamicArena<T>(int size) : items(std::vector<T>(size)) {}
+
+    std::vector<T> items;
+    int tail = -1;
+
+    T *make(T item) {
+        // std::cout << tail << "/" << items.size() << std::endl;
+        if (tail < items.size() - 1) {
             ++tail;
         } else {
             tail = 0;
