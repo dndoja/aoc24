@@ -42,7 +42,6 @@ template <typename T> struct DynamicArena {
     int tail = -1;
 
     T *make(T item) {
-        // std::cout << tail << "/" << items.size() << std::endl;
         if (tail < items.size() - 1) {
             ++tail;
         } else {
